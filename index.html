@@ -363,10 +363,7 @@
         .explanation { margin-top: 16px; padding: 16px; background: var(--hover-bg); border-radius: 14px; display: none; font-size: 0.98rem; border: 1px solid var(--border); overflow: visible !important; max-width: 100%; }
         @media (min-width: 640px) { .explanation { margin-top: 18px; padding: 18px 20px; font-size: 1.05rem; } }
 
-        .exam-blurred { filter: blur(40px) brightness(0.02) !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; transition: none !important; }
-        .exam-touch-shielded { filter: blur(38px) brightness(0.08) !important; opacity: 0.01 !important; transition: none !important; }
-        #mobileTouchShieldOverlay { display: none; position: fixed; inset: 0; z-index: 99990; background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); color: #ffffff; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; pointer-events: none !important; user-select: none !important; -webkit-user-select: none !important; }
-        #antiCheatWatermark { display: none; position: fixed; inset: 0; z-index: 9990; pointer-events: none !important; overflow: hidden; user-select: none !important; -webkit-user-select: none !important; }
+        .exam-blurred { filter: blur(36px) !important; opacity: 0 !important; pointer-events: none !important; transition: none !important; }
         
         #loadingOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.92); z-index:999999; justify-content:center; align-items:center; flex-direction:column; }
         .spinner { border: 4px solid #e2e8f0; border-top: 4px solid var(--primary); border-radius: 50%; width: 46px; height: 46px; animation: spin 0.9s linear infinite; }
@@ -434,16 +431,6 @@
             <div id="customDialogButtons" style="display:flex; gap:10px; justify-content:center;"></div>
         </div>
     </div>
-
-    <div id="mobileTouchShieldOverlay">
-        <div style="max-width: 420px; padding: 26px 22px; border-radius: 20px; background: rgba(30, 41, 59, 0.92); border: 1.5px solid rgba(248, 113, 113, 0.45); box-shadow: 0 20px 40px rgba(0,0,0,0.45);">
-            <div style="font-size: 3rem; margin-bottom: 10px;">🛡️</div>
-            <div style="font-size: 1.15rem; font-weight: 800; color: #f87171; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.03em;">Chống chụp màn hình mức cao nhất</div>
-            <div style="font-size: 0.98rem; color: #e2e8f0; line-height: 1.55; font-weight: 600;">Chạm và giữ 1 ngón tay trên màn hình để hiển thị nội dung đề thi.
-(Mọi thao tác chụp màn hình bằng phím cứng hoặc vuốt 2-3 ngón tay sẽ bị khóa ngay lập tức)</div>
-        </div>
-    </div>
-    <div id="antiCheatWatermark"></div>
 
     <div id="quizApp" class="quiz-app-prestart">
         <div id="loadingOverlay">
@@ -620,10 +607,10 @@
         const IS_REQUIRE_ACCESS_CODE = false;
         const EXPECTED_ACCESS_CODE_B64 = "";
         const HAS_STUDENT_INFO = false;
-        const P_SCORES = {"1":0.25,"2":1,"3":1,"4":1,"5":1}; 
+        const P_SCORES = {"1":1,"2":1,"3":1,"4":1,"5":1}; 
         const START_TIME_STR = ""; 
         const END_TIME_STR = ""; 
-        const EXAM_ID = "EXAM_UID_gkfcc0lk8zm"; 
+        const EXAM_ID = "EXAM_UID_exhpdnadoao"; 
         const FORM_URL = ""; 
         const FORM_PLATFORM = "google";
         const FORM_PAGE_HISTORY = "0";
@@ -1184,11 +1171,13 @@
                 modal.style.display = 'none';
                 const quizApp = document.getElementById('quizApp');
                 if (quizApp && !window.examEnded) quizApp.classList.remove('exam-blurred');
+                lastViolationTime = Date.now();
                 setTimeout(() => {
                     window.isSystemAlert = false;
+                    lastViolationTime = Date.now();
                     if (window.resetAntiCheatTick) window.resetAntiCheatTick();
                     if (callback) callback();
-                }, 250);
+                }, 300);
             };
             btnsEl.appendChild(okBtn);
             modal.style.display = 'flex';
@@ -1471,127 +1460,39 @@
             antiCheatInitialized = true;
 
             const quizApp = document.getElementById('quizApp');
-            const touchShieldEl = document.getElementById('mobileTouchShieldOverlay');
-            const watermarkEl = document.getElementById('antiCheatWatermark');
-            const isMobileTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
-
             let baseWidth = window.innerWidth;
             let baseHeight = window.innerHeight;
             let lastOrientation = window.orientation || 0;
             let lastTypingTime = 0;
-            let activeTouchCount = 0;
-            let touchStartX = 0;
-            let touchStartY = 0;
-            let maxTouchMoveDist = 0;
-            let hadMultiTouchInGesture = false;
-
-            const isTypingInTextField = () => {
-                const el = document.activeElement;
-                if (!el || !el.tagName) return false;
-                const tag = el.tagName.toUpperCase();
-                if (tag === 'TEXTAREA') return true;
-                if (tag === 'INPUT') {
-                    const tp = (el.type || 'text').toLowerCase();
-                    return tp === 'text' || tp === 'number' || tp === 'search' || tp === 'tel' || tp === 'password';
-                }
-                return false;
-            };
-
-            // Khởi tạo lớp vân chìm (Watermark) định danh thí sinh chống chụp qua thiết bị thứ 2
-            const renderAntiCheatWatermark = () => {
-                if (!watermarkEl || window.examEnded) {
-                    if (watermarkEl) watermarkEl.style.display = 'none';
-                    return;
-                }
-                let stuInfoParts = [];
-                try {
-                    const store = window.studentFieldStore || {};
-                    Object.keys(store).forEach(k => {
-                        if (store[k] && String(store[k]).trim()) stuInfoParts.push(String(store[k]).trim());
-                    });
-                } catch (e) {}
-                const stampText = (stuInfoParts.length > 0 ? stuInfoParts.join(' • ') : 'BÀI THI BẢO MẬT') + ' • ' + new Date().toLocaleTimeString();
-                watermarkEl.style.display = 'block';
-                watermarkEl.innerHTML = '';
-                const grid = document.createElement('div');
-                grid.style.cssText = 'position:absolute;inset:-20%;display:grid;grid-template-columns:repeat(3, 1fr);gap:70px 40px;transform:rotate(-24deg);align-content:space-around;justify-items:center;opacity:0.055;font-weight:800;font-size:0.95rem;color:var(--text);white-space:nowrap;pointer-events:none;';
-                for (let w = 0; w < 24; w++) {
-                    const item = document.createElement('div');
-                    item.textContent = stampText;
-                    grid.appendChild(item);
-                }
-                watermarkEl.appendChild(grid);
-            };
-            renderAntiCheatWatermark();
-            setInterval(renderAntiCheatWatermark, 15000);
-
-            // Chế độ Lá chắn Chạm giữ trên Smartphone: chỉ hiển thị đề khi 1 ngón tay đang chạm màn hình (hoặc đang gõ ô tự luận/trả lời ngắn)
-            const engageMobileTouchShield = () => {
-                if (!isMobileTouchDevice || window.examEnded || !window.examStarted) {
-                    if (touchShieldEl) touchShieldEl.style.display = 'none';
-                    if (quizApp) quizApp.classList.remove('exam-touch-shielded');
-                    return;
-                }
-                if (window.isSystemAlert) {
-                    if (touchShieldEl) touchShieldEl.style.display = 'none';
-                    return;
-                }
-                if (quizApp) quizApp.classList.add('exam-touch-shielded');
-                if (touchShieldEl) touchShieldEl.style.display = 'flex';
-            };
-
-            const releaseMobileTouchShield = () => {
-                if (window.examEnded) return;
-                if (touchShieldEl) touchShieldEl.style.display = 'none';
-                if (quizApp) quizApp.classList.remove('exam-touch-shielded');
-            };
-
-            window.syncMobileAntiScreenshotState = () => {
-                if (!isMobileTouchDevice || !IS_ANTI_CHEAT) return;
-                if (window.examEnded || !window.examStarted || window.isSystemAlert) {
-                    if (touchShieldEl) touchShieldEl.style.display = 'none';
-                    if (quizApp) quizApp.classList.remove('exam-touch-shielded');
-                    return;
-                }
-                if (activeTouchCount === 1 || isTypingInTextField()) {
-                    releaseMobileTouchShield();
-                } else {
-                    engageMobileTouchShield();
-                }
-            };
 
             const markTypingActivity = (e) => {
                 const t = e && e.target && e.target.tagName ? e.target.tagName.toUpperCase() : '';
                 if (t === 'INPUT' || t === 'TEXTAREA') {
                     lastTypingTime = Date.now();
-                    window.syncMobileAntiScreenshotState();
                 }
             };
             document.addEventListener('focusin', markTypingActivity, true);
-            document.addEventListener('focusout', () => {
-                setTimeout(() => window.syncMobileAntiScreenshotState(), 50);
-            }, true);
+            document.addEventListener('focusout', markTypingActivity, true);
             document.addEventListener('input', markTypingActivity, true);
 
             const applyPrivacyBlur = () => {
-                if (quizApp && !window.examEnded) {
-                    quizApp.classList.add('exam-blurred');
-                    quizApp.classList.add('exam-touch-shielded');
-                }
-                if (isMobileTouchDevice && touchShieldEl && window.examStarted && !window.examEnded && !window.isSystemAlert) {
-                    touchShieldEl.style.display = 'flex';
-                }
+                if (quizApp && !window.examEnded) quizApp.classList.add('exam-blurred');
             };
 
-            const msgScreenshotViolation = window.L.viol_screenshot || 'Phát hiện thao tác chụp màn hình hoặc cử chỉ đa điểm bị cấm';
+            window.addEventListener('focus', () => {
+                if (quizApp && !window.examEnded && !window.isSystemAlert) {
+                    quizApp.classList.remove('exam-blurred');
+                }
+            });
 
             const addViolation = (reason) => {
-                if (window.examEnded || !window.examStarted) return;
+                if (window.examEnded || !window.examStarted || window.isSystemAlert) return;
                 let now = Date.now();
                 if (window.examStartGraceUntil && now < window.examStartGraceUntil) return;
-                applyPrivacyBlur();
-                if (now - lastViolationTime < 2200) return; 
+                if (now - lastViolationTime < 2800) return; 
                 lastViolationTime = now;
+                window.isSystemAlert = true;
+                applyPrivacyBlur();
 
                 violationCount++; 
                 violationDetails.push("[" + new Date().toLocaleTimeString() + "] " + reason);
@@ -1599,93 +1500,41 @@
                 safeStorage.set(EXAM_ID + "_VIOLATION_LOGS", JSON.stringify(violationDetails));
                 
                 if (violationCount > MAX_VIOLATIONS) { 
-                    if (touchShieldEl) touchShieldEl.style.display = 'none';
                     safeStorage.set(EXAM_ID + "_LOCKED", window.L.html_ban_reason);
                     gradeQuiz(true, true);
                     lockExam(window.L.html_ban_reason || "Hủy bài thi do vi phạm quy chế nhiều lần.");
-                    setTimeout(() => showExamAlert(window.L.html_ac_ban || "Bài thi đã bị khóa!", null, "⛔"), 50); 
+                    setTimeout(() => showExamAlert(window.L.html_ac_ban || "Bài thi đã bị khóa!", null, "⛔"), 30); 
                 } else { 
-                    if (touchShieldEl) touchShieldEl.style.display = 'none';
                     setTimeout(() => { 
                         showExamAlert(
                             (window.L.html_ac_warn || "CẢNH BÁO VI PHẠM") + "\n\n" +
                             "• " + (window.L.html_ac_reason || "Lý do") + ": " + reason + "\n" +
                             "• Số lần vi phạm: " + violationCount + " / " + MAX_VIOLATIONS + "\n\n" +
                             (window.L.html_ac_recorded || "Hệ thống đã ghi nhận vào báo cáo!"),
-                            () => { window.syncMobileAntiScreenshotState(); },
+                            null,
                             "⚠️"
                         ); 
                     }, 30); 
                 }
             };
 
-            // Chặn và phát hiện chụp màn hình trên Smartphone (Vuốt 2-3 ngón tay, Chạm đa điểm, Phím cứng Nguồn + Âm lượng làm ngắt touchcancel)
-            if (isMobileTouchDevice) {
-                document.addEventListener('touchstart', (e) => {
-                    if (window.examEnded || !window.examStarted) return;
-                    activeTouchCount = e.touches ? e.touches.length : 0;
-                    if (activeTouchCount >= 2) {
-                        hadMultiTouchInGesture = true;
-                        applyPrivacyBlur();
-                        try { e.preventDefault(); } catch (err) {}
-                        addViolation(msgScreenshotViolation);
-                        return;
-                    }
-                    hadMultiTouchInGesture = false;
-                    if (activeTouchCount === 1) {
-                        touchStartX = e.touches[0].clientX;
-                        touchStartY = e.touches[0].clientY;
-                        maxTouchMoveDist = 0;
-                        if (!window.isSystemAlert && quizApp) {
-                            quizApp.classList.remove('exam-blurred');
-                        }
-                        releaseMobileTouchShield();
-                    }
-                }, { capture: true, passive: false });
-
-                document.addEventListener('touchmove', (e) => {
-                    if (window.examEnded || !window.examStarted) return;
-                    const cnt = e.touches ? e.touches.length : 0;
-                    if (cnt >= 2) {
-                        hadMultiTouchInGesture = true;
-                        applyPrivacyBlur();
-                        try { e.preventDefault(); } catch (err) {}
-                        addViolation(msgScreenshotViolation);
-                        return;
-                    }
-                    if (cnt === 1) {
-                        const dx = e.touches[0].clientX - touchStartX;
-                        const dy = e.touches[0].clientY - touchStartY;
-                        const dist = Math.hypot(dx, dy);
-                        if (dist > maxTouchMoveDist) maxTouchMoveDist = dist;
-                    }
-                }, { capture: true, passive: false });
-
-                document.addEventListener('touchend', (e) => {
-                    if (window.examEnded || !window.examStarted) return;
-                    activeTouchCount = e.touches ? e.touches.length : 0;
-                    if (activeTouchCount === 0) {
-                        hadMultiTouchInGesture = false;
-                        if (!isTypingInTextField()) {
-                            engageMobileTouchShield();
-                        }
-                    }
-                }, { capture: true, passive: true });
-
-                // Khi bấm tổ hợp phím cứng (Nguồn + Giảm/Tăng âm lượng) hoặc kéo thanh trạng thái / vuốt 3 ngón trên Android & iOS,
-                // hệ điều hành sẽ lập tức phát sự kiện touchcancel để thu hồi quyền chạm của trình duyệt!
-                document.addEventListener('touchcancel', () => {
-                    if (window.examEnded || !window.examStarted) return;
-                    activeTouchCount = 0;
+            // Chặn thao tác vuốt/chạm từ 2-3 ngón tay chụp màn hình trên Smartphone (chuyển thẳng về cảnh báo vi phạm chuẩn duy nhất)
+            const handleMultiTouchScreenshot = (e) => {
+                if (window.examEnded || !window.examStarted) return;
+                if (e.touches && e.touches.length >= 2) {
                     applyPrivacyBlur();
-                    // Nếu đang giữ ngón tay đọc đề (di chuyển < 25px) hoặc chạm đa điểm mà hệ điều hành ngắt touch -> chắc chắn do bấm phím cứng chụp màn hình hoặc kéo Control Center!
-                    if (hadMultiTouchInGesture || maxTouchMoveDist < 25) {
-                        addViolation(msgScreenshotViolation);
-                    }
-                }, { capture: true, passive: true });
-
-                setTimeout(() => window.syncMobileAntiScreenshotState(), 120);
-            }
+                    try { e.preventDefault(); } catch (err) {}
+                    addViolation(window.L.viol_shortcut);
+                }
+            };
+            document.addEventListener("touchstart", handleMultiTouchScreenshot, { capture: true, passive: false });
+            document.addEventListener("touchmove", handleMultiTouchScreenshot, { capture: true, passive: false });
+            document.addEventListener("gesturestart", (e) => {
+                if (window.examEnded || !window.examStarted) return;
+                applyPrivacyBlur();
+                try { e.preventDefault(); } catch (err) {}
+                addViolation(window.L.viol_shortcut);
+            }, { capture: true, passive: false });
 
             document.addEventListener("contextmenu", (e) => e.preventDefault(), {passive: false});
             document.addEventListener("selectstart", (e) => {
@@ -1715,12 +1564,11 @@
                 const code = e.keyCode || e.which;
                 const ctrlOrMeta = e.ctrlKey || e.metaKey;
 
-                // Chặn phím PrintScreen trên máy tính & phím cứng Âm lượng (VolumeUp/VolumeDown dùng trong tổ hợp chụp màn hình Nguồn + Âm lượng trên Smartphone)
                 if (key === "PrintScreen" || code === 44 || key === "AudioVolumeDown" || key === "AudioVolumeUp" || key === "VolumeDown" || key === "VolumeUp" || code === 24 || code === 25 || code === 174 || code === 175) {
                     applyPrivacyBlur();
                     try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(''); } catch (err) {}
                     e.preventDefault();
-                    addViolation(msgScreenshotViolation);
+                    addViolation(window.L.viol_shortcut);
                     return;
                 }
                 if (key === "F12" || code === 123 ||
@@ -1741,7 +1589,7 @@
                 if (key === "PrintScreen" || code === 44 || key === "AudioVolumeDown" || key === "AudioVolumeUp" || key === "VolumeDown" || key === "VolumeUp" || code === 24 || code === 25 || code === 174 || code === 175) {
                     applyPrivacyBlur();
                     try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(''); } catch (err) {}
-                    addViolation(msgScreenshotViolation);
+                    addViolation(window.L.viol_shortcut);
                 }
             }, true);
 
@@ -1761,7 +1609,6 @@
 
             window.addEventListener("blur", () => { 
                 if (window.examEnded || window.isSystemAlert || window.isRequestingFullscreen) return;
-                // Làm mờ tức thì ở 0ms ngay khi mất tiêu điểm (trước khi trình chụp màn hình của trình duyệt/hệ điều hành kịp ghi hình)
                 applyPrivacyBlur();
                 setTimeout(() => {
                     if (window.examEnded || window.isSystemAlert || window.isRequestingFullscreen) return;
@@ -1769,8 +1616,10 @@
                     if (activeTag === 'iframe') return;
                     if (!document.hasFocus()) {
                         addViolation(window.L.viol_leave);
+                    } else if (quizApp && !window.isSystemAlert) {
+                        quizApp.classList.remove('exam-blurred');
                     }
-                }, 80);
+                }, 120);
             });
 
             window.lastTickTime = Date.now();
@@ -1783,7 +1632,7 @@
                 let deltaTime = currentTickTime - window.lastTickTime;
                 window.lastTickTime = currentTickTime;
 
-                if (deltaTime > 2800) {
+                if (deltaTime > 3800) {
                     applyPrivacyBlur();
                     addViolation(window.L.viol_freeze);
                     return;
@@ -1795,14 +1644,14 @@
                     return;
                 }
 
-                if (!document.hasFocus()) {
+                if (!isInIframe && !document.hasFocus()) {
                     const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
                     if (activeTag !== 'iframe') {
                         applyPrivacyBlur();
                         addViolation(window.L.viol_leave);
                     }
                 }
-            }, 350);
+            }, 500);
 
             window.addEventListener("orientationchange", () => {
                 lastOrientation = window.orientation || 0;
@@ -1842,14 +1691,13 @@
                 let overlay = document.getElementById('enforceFullscreenOverlay');
                 if (!isCurrentlyFullscreen()) { 
                     applyPrivacyBlur();
-                    if (touchShieldEl) touchShieldEl.style.display = 'none';
                     if (overlay) overlay.style.display = 'flex'; 
                     if (!window.isSystemAlert && !window.isRequestingFullscreen) {
                         addViolation(window.L.viol_fullscreen);
                     } 
                 } else { 
                     if (overlay) overlay.style.display = 'none'; 
-                    window.syncMobileAntiScreenshotState();
+                    if (quizApp && !window.isSystemAlert) quizApp.classList.remove('exam-blurred');
                 }
             };
             
@@ -3628,11 +3476,7 @@ function resizeBlank(el) {
             if (tuOverlay) tuOverlay.style.display = 'none';
 
             const quizApp = document.getElementById('quizApp');
-            if (quizApp) { quizApp.classList.remove('exam-blurred'); quizApp.classList.remove('exam-touch-shielded'); }
-            const tShield = document.getElementById('mobileTouchShieldOverlay');
-            if (tShield) tShield.style.display = 'none';
-            const wmEl = document.getElementById('antiCheatWatermark');
-            if (wmEl) wmEl.style.display = 'none';
+            if (quizApp) quizApp.classList.remove('exam-blurred');
             const fsOverlay = document.getElementById('enforceFullscreenOverlay');
             if (fsOverlay) fsOverlay.style.display = 'none';
             
