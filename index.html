@@ -377,6 +377,32 @@
         
         <div id="stepStudentInfo" style="display:none; margin: auto; width: 100%; max-width: 480px; flex-direction: column; align-items: center; padding: 32px 28px; background: var(--card); color: var(--text); border-radius: 22px; box-shadow: 0 20px 40px -15px rgba(15,23,42,0.12); border: 1px solid var(--border);">
             
+                <div id="studentInfoBox" style="width: 100%; max-width: 450px; margin: 0 auto;">
+                    <h3 style="margin-top:0; color: var(--primary); text-align: center; font-size: 1.4rem;">Thông tin học sinh</h3>
+                    <div style="display: flex; flex-direction: column; gap: 18px;">
+                        
+                    <div style="text-align: left;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 8px;">Họ và tên <span style='color:#ef4444;'>*</span></label>
+                        <input type="text" id="field_1897338614" data-field-title="Họ và tên" oninput="syncStudentFieldValue('field_1897338614', this.value)" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1.1rem; outline: none; box-sizing: border-box;" required spellcheck="false" autocomplete="off">
+                    </div>
+                
+                    <div style="text-align: left;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 8px;">Lớp <span style='color:#ef4444;'>*</span></label>
+                        <input type="text" id="field_2147101279" data-field-title="Lớp" oninput="syncStudentFieldValue('field_2147101279', this.value)" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1.1rem; outline: none; box-sizing: border-box;" required spellcheck="false" autocomplete="off">
+                    </div>
+                
+                    <div style="text-align: left;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 8px;">STT <span style='color:#ef4444;'>*</span></label>
+                        <input type="text" id="field_725649038" data-field-title="STT" oninput="syncStudentFieldValue('field_725649038', this.value)" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1.1rem; outline: none; box-sizing: border-box;" required spellcheck="false" autocomplete="off">
+                    </div>
+                
+                    <div style="text-align: left;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 8px;">Trường <span style='color:#ef4444;'>*</span></label>
+                        <input type="text" id="field_123456789" data-field-title="Trường" oninput="syncStudentFieldValue('field_123456789', this.value)" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1.1rem; outline: none; box-sizing: border-box;" required spellcheck="false" autocomplete="off">
+                    </div>
+                
+                    </div>
+                </div>
             <button onclick="nextStepFromStudentInfo()" style="background:var(--primary); color:white; border:none; padding:14px 22px; border-radius:12px; font-size:1.1rem; font-weight:800; cursor:pointer; width:100%; margin-top:24px; transition:all 0.2s; box-shadow:0 4px 12px rgba(37,99,235,0.25);">Tiếp tục &rarr;</button>
         </div>
 
@@ -479,7 +505,27 @@
                 <div class='q-nav-grid' id='qNavGrid'></div>
             </div>
             <div class='main-content'>
+                <div id="inExamStudentInfoCard" style="background:var(--card); padding:16px 20px; border-radius:14px; border:1.5px solid var(--border); border-left:5px solid var(--primary); margin-bottom:18px; box-shadow:0 1px 4px rgba(15,23,42,0.04);"><h3 style="margin:0 0 12px 0; color:var(--primary); font-size:1.15rem; font-weight:800;">Thông tin học sinh</h3><div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
+                    <div style="text-align: left;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 8px;">Họ và tên <span style='color:#ef4444;'>*</span></label>
+                        <input type="text" id="field_1897338614_exam" data-sync-target="field_1897338614" data-field-title="Họ và tên" oninput="syncStudentFieldValue('field_1897338614', this.value)" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1.1rem; outline: none; box-sizing: border-box;" required spellcheck="false" autocomplete="off">
+                    </div>
                 
+                    <div style="text-align: left;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 8px;">Lớp <span style='color:#ef4444;'>*</span></label>
+                        <input type="text" id="field_2147101279_exam" data-sync-target="field_2147101279" data-field-title="Lớp" oninput="syncStudentFieldValue('field_2147101279', this.value)" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1.1rem; outline: none; box-sizing: border-box;" required spellcheck="false" autocomplete="off">
+                    </div>
+                
+                    <div style="text-align: left;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 8px;">STT <span style='color:#ef4444;'>*</span></label>
+                        <input type="text" id="field_725649038_exam" data-sync-target="field_725649038" data-field-title="STT" oninput="syncStudentFieldValue('field_725649038', this.value)" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1.1rem; outline: none; box-sizing: border-box;" required spellcheck="false" autocomplete="off">
+                    </div>
+                
+                    <div style="text-align: left;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 8px;">Trường <span style='color:#ef4444;'>*</span></label>
+                        <input type="text" id="field_123456789_exam" data-sync-target="field_123456789" data-field-title="Trường" oninput="syncStudentFieldValue('field_123456789', this.value)" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1.1rem; outline: none; box-sizing: border-box;" required spellcheck="false" autocomplete="off">
+                    </div>
+                </div></div>
                 <div class='section' id='part1' data-parttype='1' data-title='Dạng 1: Một phương án đúng'>
 <div class='section-title'>Dạng 1: Một phương án đúng</div>
 <div class='group-container' data-fixed='true' data-group-type='2' data-orig-qnums='1,2,3,4,5' data-group-range='Câu 1 – Câu 5' data-group-label='🔗 Nhóm câu hỏi liên kết (Câu 1 – Câu 5)'>
@@ -606,12 +652,12 @@
         const IS_ANTI_CHEAT = true;
         const IS_REQUIRE_ACCESS_CODE = false;
         const EXPECTED_ACCESS_CODE_B64 = "";
-        const HAS_STUDENT_INFO = false;
+        const HAS_STUDENT_INFO = true;
         const P_SCORES = {"1":1,"2":1,"3":1,"4":1,"5":1}; 
         const START_TIME_STR = ""; 
         const END_TIME_STR = ""; 
-        const EXAM_ID = "EXAM_UID_exhpdnadoao"; 
-        const FORM_URL = ""; 
+        const EXAM_ID = "EXAM_UID_8osm38tpd2"; 
+        const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSebbMOm9UXzJYzonpfwWRHhfFm8NQM3DS0SnAk7jHnJD7wizg/formResponse"; 
         const FORM_PLATFORM = "google";
         const FORM_PAGE_HISTORY = "0";
         const IS_PUBLISH_SCORE = true;
@@ -1338,7 +1384,10 @@
         window.nextStepFromStudentInfo = async function() {
             if (IS_ANTI_CHEAT) window.tryEnterFullscreen(true);
             let missing = [];
-            
+            if(!getStudentFieldValue("field_1897338614")) missing.push("Họ và tên");
+            if(!getStudentFieldValue("field_2147101279")) missing.push("Lớp");
+            if(!getStudentFieldValue("field_725649038")) missing.push("STT");
+            if(!getStudentFieldValue("field_123456789")) missing.push("Trường");
             if (missing.length > 0) {
                 showExamAlert(window.L.html_missing_fields + missing.join(", ") + window.L.html_before_submit);
                 return;
@@ -2324,7 +2373,10 @@ function resizeBlank(el) {
                 let extraInfoBox = document.getElementById('timeUpStudentInfoPrompt');
                 if (HAS_STUDENT_INFO && card && !extraInfoBox) {
                     let missingNow = [];
-                    
+                    if(!getStudentFieldValue("field_1897338614")) missingNow.push("Họ và tên");
+                    if(!getStudentFieldValue("field_2147101279")) missingNow.push("Lớp");
+                    if(!getStudentFieldValue("field_725649038")) missingNow.push("STT");
+                    if(!getStudentFieldValue("field_123456789")) missingNow.push("Trường");
                     if (missingNow.length > 0) {
                         extraInfoBox = document.createElement('div');
                         extraInfoBox.id = 'timeUpStudentInfoPrompt';
@@ -3444,7 +3496,10 @@ function resizeBlank(el) {
 
             if (!isForce) { 
                 let missing = [];
-                 
+                if(!getStudentFieldValue("field_1897338614")) missing.push("Họ và tên");
+                if(!getStudentFieldValue("field_2147101279")) missing.push("Lớp");
+                if(!getStudentFieldValue("field_725649038")) missing.push("STT");
+                if(!getStudentFieldValue("field_123456789")) missing.push("Trường"); 
                 if (missing.length > 0) { 
                     showExamAlert(window.L.html_missing_fields + missing.join(", ") + window.L.html_before_submit); 
                     return; 
@@ -3820,7 +3875,10 @@ function resizeBlank(el) {
             window.scrollTo({top: 0, behavior: 'smooth'});
 
             let studentInfoLog = [];
-            
+            studentInfoLog.push("• Họ và tên: " + (getStudentFieldValue("field_1897338614") || window.L.gf_empty));
+            studentInfoLog.push("• Lớp: " + (getStudentFieldValue("field_2147101279") || window.L.gf_empty));
+            studentInfoLog.push("• STT: " + (getStudentFieldValue("field_725649038") || window.L.gf_empty));
+            studentInfoLog.push("• Trường: " + (getStudentFieldValue("field_123456789") || window.L.gf_empty));
             let studentInfoBlock = studentInfoLog.length > 0 ? ("--- THÔNG TIN HỌC SINH ---\n" + studentInfoLog.join("\n") + "\n\n") : "";
             let accCodeStr = window.studentAccessCode ? ("🔐 Mã xác nhận: " + window.studentAccessCode + "\n") : "";
             let topAlertSection = specialTeacherAlertBanner
@@ -3848,7 +3906,13 @@ function resizeBlank(el) {
             }
 
             // ĐIỀN DỮ LIỆU TỰ ĐỘNG VÀO FORM
-            
+            formAnswers["entry.1897338614"] = getStudentFieldValue("field_1897338614") || window.L.gf_empty;
+            formAnswers["entry.2147101279"] = getStudentFieldValue("field_2147101279") || window.L.gf_empty;
+            formAnswers["entry.725649038"] = getStudentFieldValue("field_725649038") || window.L.gf_empty;
+            formAnswers["entry.1324233572"] = totalScore.toFixed(2);
+            formAnswers["entry.202774528"] = violationReport;
+            formAnswers["entry.168558836"] = studentDetailsText;
+            formAnswers["entry.123456789"] = getStudentFieldValue("field_123456789") || window.L.gf_empty;
 
             // SUBMIT FORM ĐA KÊNH BỀN VỮNG TRÊN MỌI THIẾT BỊ (GOOGLE FORM & MICROSOFT FORM)
             if (FORM_URL && window.submitFormReliably) {
